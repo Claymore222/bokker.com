@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Document</title>
+
+</head>
+<style>
+  #title {
+    background: linear-gradient(to right, #0000ff, #88ff00, #ff0000, #ff3399, #46eefa);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: rainbow_animation 4s ease-in-out infinite;
+    background-size: 400% 100%;
+  }
+
+  @keyframes rainbow_animation {
+
+    0%,
+    100% {
+      background-position: 0 0;
+    }
+
+    50% {
+      background-position: 100% 0;
+    }
+  }
+</style>
+
+<body>  
+  <%- include('partials/menubar.ejs') %>
+  <link rel="stylesheet" href="/index.css"/>
+  <div class="layout">  
+    <h3>BEST BOOKS</h3>
+
+    <input type="radio" name="slider" id="item-1" checked />
+    <input type="radio" name="slider" id="item-2" />
+    <input type="radio" name="slider" id="item-3" />
+
+    <div class="cards">
+      <% topRatedBooks.forEach((book, index)=> { %>
+        <label class="card" for="item-<%= index + 1 %>" id="song-<%= index + 1 %>">
+          <h4><a href="/book/<%= book._id %>" style="color: #555555;">
+              <%= book.title %>
+            </a></h4>
+          <img src="<%= book.book_image %>" alt="book" />
+        </label>
+        <% }) %>
+    </div>
+  </div>
+
+  <div></div>
+
+  <%- include("partials/footer.ejs") %>
+
+  <script src="https://kit.fontawesome.com/a7f07a883a.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+</body>
+
+</html>

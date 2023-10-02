@@ -1,0 +1,378 @@
+<html lang="en">
+
+<head>
+   <meta charset="UTF-8" />
+   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+   <title>Register</title>
+</head>
+<style>
+   .star-rating {
+      display: inline-block;
+      direction: rtl;
+   }
+
+   .star-rating input {
+      display: none;
+   }
+
+   .star-rating label {
+      font-size: 1.5rem;
+      color: gray;
+      cursor: pointer;
+   }
+
+   .star-rating label:hover,
+   .star-rating label:hover~label,
+   .star-rating input:checked~label {
+      color: orange;
+   }
+</style>
+<script>
+   function updateLabel(input) {
+      const labelId = input.getAttribute('pointsLabel');
+      const label = document.getElementById(labelId);
+      label.textContent = `Points: ${input.value}`;
+   }
+</script>
+
+<body>
+   <div id="genresData" data-genres='<%= JSON.stringify(genres) %>' style="display: none;"></div>
+   <%- include("partials/menubar.ejs") %>
+      <link rel="stylesheet" href="/login_register.css" />
+      <link rel="stylesheet" href="/library.css">
+      <div class="main">
+         <div class="registration-form">
+            <div class="form-icon">
+               <span>
+                  <script src="https://cdn.lordicon.com/bhenfmcm.js"></script>
+                  <lord-icon src="https://cdn.lordicon.com/dxoycpzg.json" trigger="loop"
+                     colors="primary:#f24c00,secondary:#646e78,tertiary:#4bb3fd,quaternary:#ebe6ef,quinary:#f9c9c0"
+                     state="loop" style="width:100%;height:100%">
+                  </lord-icon>
+               </span>
+            </div>
+
+            <form action="/books/<%= book._id %>/edit" method="POST" enctype="multipart/form-data">
+               <h1 style="color: black;">Kitap Ekle</h1>
+
+               <div class="form-group">
+                  <input class="form-control item" autofocus type="text" data-label-id="titleLabel"
+                     oninput="updateLabel(this)" id="title1" name="title" placeholder="Title"
+                     value="<%= book.title %>" />
+               </div>
+
+               <div class="form-group">
+                  <input class="form-control item" type="text" data-label-id="authorLabel" oninput="updateLabel(this)"
+                     id="author" name="author" placeholder="Author" value="<%= book.author %>" />
+               </div>
+               <div class="form-group">
+                  <input class="form-control item" type="number" data-label-id="priceLabel" oninput="updateLabel(this)"
+                     id="price" name="price" min="1" max="99999" placeholder="Price" value="<%= book.price %>" />
+               </div>
+               <div class="dropdown w-100">
+                  <button type="button" class="btn btn-secondary dropdown-toggle w-100" data-toggle="dropdown"
+                     style="margin-bottom: 25px;">
+                     Select Book Genres
+                  </button>
+                  <div class="dropdown-menu w-100" style="max-height: 300px; overflow-y: auto;">
+                     <div class="error-message-primary" id="error-message" style="display: none;">
+                        <span style="font-weight: 450;">Maximum 3 tag!</span>
+                     </div>
+                     <div class="form-group px-3 py-2">
+                        <input type="text" class="form-control" id="search-input" placeholder="Search genres">
+
+                        <% genres.forEach(genre=> { %>
+                           <label class="check" id="label-<%= genre %>">
+                              <input type="checkbox" name="genres[]" value="<%= genre %>" id="checkbox-<%= genre %>"
+                                 <%if(book.genres.includes(genre)) { %> checked <% } %>
+                                 >
+                                 <span>
+                                    <%= genre %>
+                                 </span>
+                           </label>
+                           <% }) %>
+
+                     </div>
+                  </div>
+                  <script>
+                     var maxAllowedCheckboxes = 3;
+                     var checkboxes = document.querySelectorAll('input[name="genres[]"]');
+                     var error_message = document.getElementById('error-message');
+                     checkboxes.forEach(function (checkbox) {
+                        checkbox.addEventListener('change', function () {
+                           var checkedCheckboxes = document.querySelectorAll('input[name="genres[]"]:checked');
+                           if (checkedCheckboxes.length > maxAllowedCheckboxes) {
+                              this.checked = false;
+                              error_message.style.display = 'block';
+                              setTimeout(() => {
+                                 error_message.style.display = 'none';
+                              }, 1750);
+                           }
+                        });
+                     });
+
+                     const genresDiv = document.getElementById('genresData');
+                     const genres = JSON.parse(genresDiv.getAttribute('data-genres'));
+                     const searchInput = document.getElementById('search-input');
+
+                     searchInput.addEventListener('input', function () {
+                        const searchTerm = searchInput.value.toLowerCase();
+                        genres.forEach(genre => {
+                           const label = document.getElementById(`label-${genre}`);
+                           const genreText = label.querySelector("span").textContent.toLowerCase();
+                           if (genreText.includes(searchTerm)) {
+                              label.style.display = 'inline-block';
+                           } else {
+                              label.style.display = 'none';
+                           }
+                        });
+                     });
+                  </script>
+               </div>
+               <div class="form-group">
+                  <input class="form-control item" type="number" data-label-id="pageCountLabel"
+                     oninput="updateLabel(this)" id="page_count" name="page_count" min="1" max="20000"
+                     placeholder="Page Count" value="<%= book.page_count %>" />
+               </div>
+               <div class="rating">
+                  <span class="rating__result"></span>
+                  <i class="rating__star far fa-star"></i>
+                  <i class="rating__star far fa-star"></i>
+                  <i class="rating__star far fa-star"></i>
+                  <i class="rating__star far fa-star"></i>
+                  <i class="rating__star far fa-star"></i>
+               </div>
+               <div class="form-group">
+                  <input class="form-control item" data-label-id="pointsLabel" oninput="updateLabel(this)" id="points"
+                     name="points" placeholder="Points" style="display: none;" value="<%= book.points %>" />
+               </div>
+               <p id="rating-alert" class="text-danger" style="display: none;">Please select a rating.</p>
+               <div class="form-group">
+                  <input class="form-control item" type="text" data-label-id="descriptionLabel"
+                     oninput="updateLabel(this)" id="description" name="description" placeholder="Description"
+                     value="<%= book.description %>" />
+               </div>
+               <div class="form-group">
+                  <input class="form-control item" type="date" data-label-id="publicationDateLabel"
+                     oninput="updateLabel(this)" id="publication_date" name="publication_date" max="2024-01-01"
+                     placeholder="Publication Date" value="<%= book.publication_date %>" />
+               </div>
+               <div class="form-group">
+                  <input class="form-control item " type="text" data-label-id="isbnLabel" oninput="updateLabel(this)"
+                     id="isbn" name="isbn" placeholder="Isbn No" value="<%= book.isbn %>" />
+               </div>
+
+               <div class="form-group">
+                  <input type="file" class="form-control item" id="bookImage" name="book_image" accept="image/*"
+                     onchange="checkFileSize(this)" placeholder="Book Image">
+                  <span id="fileSizeError" style="color: red; display: none;">Dosya boyutu çok büyük!</span>
+               </div>
+               <script>
+                  function checkFileSize(input) {
+                     const maxFileSize = 1.5 * 1024 * 1024;
+                     console.log(maxFileSize)
+                     const fileSizeError = document.getElementById('fileSizeError');
+
+                     if (input.files && input.files[0].size > maxFileSize) {
+                        fileSizeError.style.display = 'block';
+                        input.value = ''; // Dosyayı sıfırla
+                     } else {
+                        fileSizeError.style.display = 'none';
+                     }
+                  }
+               </script>
+               <button id="submitButton" type="submit" class="form-control item" value="book"
+                  style="line-height: 20px;">
+
+                  <div id="equal" style="display: none;">
+                     <script src="https://cdn.lordicon.com/bhenfmcm.js"></script>
+                     <lord-icon src="https://cdn.lordicon.com/dpinvufc.json" trigger="loop"
+                        colors="primary:#66d7ee,secondary:#08a88a" stroke="100" style="width:50px;height:50px">
+                     </lord-icon>
+                     <h6 style="line-height: 20px;">Yanıt bekleniyor...</h6>
+                  </div>
+                  <div id="normalbutton">
+                     <script src="https://cdn.lordicon.com/bhenfmcm.js"></script>
+                     <lord-icon src="https://cdn.lordicon.com/dxoycpzg.json" trigger="morph"
+                        colors="primary:#f24c00,secondary:#646e78,tertiary:#4bb3fd,quaternary:#ebe6ef,quinary:#f9c9c0"
+                        state="morph" style="width:50px;height:50px">
+                     </lord-icon>
+                     <h6 style="line-height: 20px;">Kitap Ekle</h6>
+                  </div>
+
+               </button>
+
+
+            </form>
+
+         </div>
+         <div class="labellarburada">
+            <section class="dark display-none">
+               <h1 style="text-align: center;color: white;">BOOK EXAMPLE</h1>
+               <div class="container py-4">
+                  <article class="postcard red">
+                     <a class="postcard__img_link" href="#">
+                        <img id="imagePreview" class="postcard__img" src="<%= book.book_image %>" alt="Image Title" />
+                     </a>
+                     <div class="postcard__text">
+                        <h1 class="postcard__title red">
+                           <a href="#">
+                              <label id="titleLabel" for="title">
+                                 <%= book.title %>
+                              </label>
+                           </a>
+                        </h1>
+                        <div class="postcard__subtitle small">
+                           <time datetime="2020-05-25 12:00:00">
+                              <i class="fas fa-calendar-alt mr-2">
+                                 <label id="publicationDateLabel" for="publication_date">
+                                    <%= book.publication_date %>
+                                 </label></i>
+                           </time>
+                        </div>
+                        <div class="postcard__bar"></div>
+                        <div class="postcard__preview-txt">
+                           <label id="descriptionLabel" for="first">
+                              <%= book.description %>
+                           </label>
+                        </div>
+                        <ul class="postcard__tagbox">
+                           <li class="tag__item"><i class="fas fa-star mr-2"></i><label id="pointsLabel" for="points">
+                                 <%= book.points %>
+                              </label></li>
+                           <li class="tag__item"><i class="fas fa-file mr-2"></i><label id="pageCountLabel"
+                                 for="page_count">
+                                 <%= book.page_count %>
+                              </label></li>
+                           <li class="tag__item play red">
+                              <a href="#"><i class="fas fa-comment mr-2"></i><label for="">Add Comment</label></a>
+                           </li>
+                        </ul>
+                     </div>
+                  </article>
+               </div>
+            </section>
+         </div>
+      </div>
+
+      </div>
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+      <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+      <script>
+         const inputs = document.querySelectorAll(".registration-form input");
+         const labellister = document.querySelector(".registration-form").querySelectorAll("label");
+         const labelList = document.querySelector(".labellarburada").querySelectorAll("label"); //çıktı olacak labelların konumu (oldukları divi sadece div)
+         const equal = document.getElementById('equal')
+         const button = document.getElementById('normalbutton');
+         function updateLabel(inputElement) {
+            const targetLabelId = inputElement.getAttribute('data-label-id');
+            const targetLabel = document.getElementById(targetLabelId);
+
+            if (targetLabel) {
+               targetLabel.textContent = inputElement.placeholder + ": " + inputElement.value || inputElement.placeholder;
+            }
+         }
+         document.addEventListener('DOMContentLoaded', function () {
+            const submitButton = document.getElementById('submitButton');
+            let isSubmitting = false;
+
+
+            submitButton.addEventListener('click', function (event) {
+
+               if (isSubmitting) {
+                  event.preventDefault();
+                  return false;
+               }
+
+               isSubmitting = true;
+
+               equal.style.display = "block";
+               button.style.display = "none";
+
+               setTimeout(() => {
+                  isSubmitting = false;
+
+                  equal.style.display = "none";
+                  button.style.display = "block";
+
+               }, 5000);
+            });
+         });
+
+         function previewImage(event) {
+            var reader = new FileReader();
+            reader.onload = function () {
+               var output = document.getElementById('imagePreview');
+               output.src = reader.result;
+               output.style.display = 'block';
+            }
+            reader.readAsDataURL(event.target.files[0]);
+         }
+
+         $('.dropdown-menu').on('click', function (event) {
+            event.stopPropagation();
+         });
+
+
+      </script>
+      <script>
+         const ratingStars = [...document.getElementsByClassName("rating__star")];
+         const ratingResult = document.getElementById('points');
+         const pointsLabel = document.getElementById('pointsLabel');
+
+         printRatingResult(ratingResult);
+         function executeRating(stars, result) {
+            const starClassActive = "rating__star fas fa-star";
+            const starClassUnactive = "rating__star far fa-star";
+            const starsLength = stars.length;
+
+            stars.forEach((star, i) => {
+               star.onclick = () => {
+                  if (star.className.indexOf(starClassUnactive) !== -1) {
+                     for (let j = 0; j <= i; j++) {
+                        stars[j].className = starClassActive;
+                     }
+                  } else {
+                     for (let j = starsLength - 1; j > i; j--) {
+                        stars[j].className = starClassUnactive;
+                     }
+                  }
+
+                  printRatingResult(result, i + 1);
+               };
+            });
+         }
+
+         function printRatingResult(result, num = 0) {
+            result.value = `${num}`;
+            pointsLabel.textContent = "Point: " + `${num}`;
+            console.log(result.value)
+         }
+
+         document.addEventListener("DOMContentLoaded", function () {
+            ratingStars[0].click();
+         });
+
+         executeRating(ratingStars, ratingResult);
+
+
+      </script>
+
+      <script>
+         document.addEventListener("DOMContentLoaded", function () {
+            const bookPoints = parseInt('<%= book.points %>');
+            const savedPoints = Number(bookPoints);  // Önceden kaydedilmiş puanı al
+            if (savedPoints > 0) {
+               for (let i = 0; i < savedPoints; i++) {
+                  ratingStars[i].className = "rating__star fas fa-star";  // Yıldızları doldur
+               }
+               printRatingResult(ratingResult, savedPoints);
+            } else {
+               ratingStars[0].click();
+            }
+         });
+      </script>
+</body>
+
+</html>

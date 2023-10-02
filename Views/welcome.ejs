@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Document</title>
+    <link rel="stylesheet" href="/welcome.css">
+   <div id="dataContainerAccessToken" data-remaining-time-access-token="<%= remainingTimeAccessToken %>"></div>
+<div id="dataContainerRefreshToken" data-remaining-time-refresh-token="<%= remainingTimeRefreshToken %>"></div>
+</head>
+<body>
+   <div class="layout-special">
+    <%- include('partials/sidebar.ejs') %>
+     
+     <div class="contents">   
+   <p class="timers" id="tokenRemainingTime">Token süresi: <span></span> saniye</p>
+   <p class="timers" id="refreshTokenRemainingTime">Refresh Token süresi: <span></span> saniye</p>
+     </div>
+   </div>
+
+<script>
+   function convertToTimeFormat(millis) {
+   const totalSeconds = Math.floor(millis / 1000);
+   const hours = Math.floor(totalSeconds / 3600);
+   const minutes = Math.floor((totalSeconds - (hours * 3600)) / 60);
+   const seconds = totalSeconds - (hours * 3600) - (minutes * 60);
+
+   return { 
+       hours: hours,
+       minutes: minutes,
+       seconds: seconds
+   };
+}
+
+let dataContainerAccessToken = document.getElementById("dataContainerAccessToken");
+let dataContainerRefreshToken = document.getElementById("dataContainerRefreshToken");
+let remainingTimeMillisAccessToken = parseInt(dataContainerAccessToken.getAttribute("data-remaining-time-access-token"));
+let remainingTimeMillisRefreshToken = parseInt(dataContainerRefreshToken.getAttribute("data-remaining-time-refresh-token"));
+
+function updateTokenTime() {
+   const timeFormat = convertToTimeFormat(remainingTimeMillisAccessToken);
+
+   if (remainingTimeMillisAccessToken <= 0) {
+       clearInterval(interval);
+       document.querySelector("#tokenRemainingTime span").innerText = "Token süresi doldu yeniden üretilecek.";
+       window.location.reload();
+   } else {
+       document.querySelector("#tokenRemainingTime span").innerText = `${timeFormat.hours}h ${timeFormat.minutes}m ${timeFormat.seconds}s`;
+       remainingTimeMillisAccessToken -= 1000; 
+   }
+}
+
+function updateRefreshTokenTime() {
+   const timeFormatRefresh = convertToTimeFormat(remainingTimeMillisRefreshToken);
+
+   if (remainingTimeMillisRefreshToken <= 0) {
+       clearInterval(intervalRefresh);
+       document.querySelector("#refreshTokenRemainingTime span").innerText = "Refresh Token süresi doldu!";
+   } else {
+       document.querySelector("#refreshTokenRemainingTime span").innerText = `${timeFormatRefresh.hours}h ${timeFormatRefresh.minutes}m ${timeFormatRefresh.seconds}s`;
+       remainingTimeMillisRefreshToken -= 1000; 
+   }
+}
+
+
+const interval = setInterval(updateTokenTime, 1000); 
+const intervalRefresh = setInterval(updateRefreshTokenTime, 1000);
+    
+updateTokenTime(); 
+updateRefreshTokenTime();
+</script>
+
+</body>
+</html>

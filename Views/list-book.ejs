@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Kitap Listesi</title>
+  <link rel="stylesheet" href="/welcome.css">
+  <style>
+  </style>
+</head>
+<body>
+  <h1>Kitap Listesi</h1>
+  <div class="book-list">
+    <% books.forEach((book) => { %>
+      <div class="book-card">
+        <h2><%= book.title %></h2>
+        <p><strong>Yazar:</strong> <%= book.author %></p>
+        <p><strong>Fiyat:</strong> <%= book.price %></p>
+        <p><strong>Konu:</strong> <%= book.plot %></p>
+        <p><strong>Sayfa Sayısı:</strong> <%= book.page_count %></p>
+        <p><strong>Yükleyen:</strong> <%= book.uploader %></p>
+        <p><strong>Puan:</strong> <%= calculateTotalPoints(book.points) %></p>
+        <p><strong>Açıklama:</strong> <%= book.description %></p>
+        <p><strong>Yayın Tarihi:</strong> <%= book.publication_date %></p>
+        <p><strong>ISBN:</strong> <%= book.isbn %></p>
+      </div>
+    <% }); %>
+  </div>
+</body>
+</html>

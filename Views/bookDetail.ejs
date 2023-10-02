@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"
+    integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <link rel="icon"
+    href="https://firebasestorage.googleapis.com/v0/b/nodejsauthentication-7d9a1.appspot.com/o/Ads%C4%B1z_tasar%C4%B1m__12_-removebg-preview.png?alt=media&token=d19c6d18-ba6d-4e12-aab1-7c62b106b487">
+  <title>
+    <%= book.title %>
+  </title>
+  <div style="display: none;">
+    <%= book._id %>
+  </div>
+</head>
+<style>
+  i {
+    margin: 5px;
+  }
+</style>
+
+<body>
+  <%- include('partials/menubar.ejs')%>
+    <div style="display: none" id="userislogin" data-user-loggedin="<%= user %>"></div>
+    <link rel="stylesheet" href="/bookDetail.css">
+    <section class="dark display-none">
+      <div class="container py-4">
+        <article class="postcard blue">
+          <a class="postcard__img_link" href="/book/<%= book._id %>">
+            <img class="postcard__img" src="<%= book.book_image %>" alt="Image Title" />
+          </a>
+          <div class="postcard__text">
+            <h1 class="postcard__title red"><a href="/book/<%= book._id %>">
+                <%= book.title %>
+              </a></h1>
+            <div class="postcard__subtitle small">
+              <time datetime="2020-05-25 12:00:00">
+                <i class="fas fa-calendar-alt mr-2"></i>
+                <%= book.publication_date %>
+              </time>
+              <a href="https://en.wikipedia.org/w/index.php?search=<%= book.author %>&title=Special:Search&ns0=1"><i class="fa fa-user"></i>
+                <%= book.author %>
+              </a>
+              <a href="/profile/<%= uploader._id %>">
+                <i class="fa fa-upload"></i>
+                <%= book.uploader_name %>
+              </a>
+            </div>
+            <div class="postcard__bar"></div>
+            <div class="postcard__preview-txt">
+              <%= book.description %>
+            </div>
+            <ul class="postcard__tagbox">
+              <li class="tag__item"><i class="fas fa-star mr-2"></i><span>
+                  <%= book.points %>
+                </span></li>
+              <li class="tag__item"><i class="fas fa-file mr-2"></i><span>
+                  <%= book.page_count %>
+                </span></li>
+              <li class="tag__item play red">
+                <% if (user) { %>
+                  <a href="#!" id="showAddComment"><i class="fas fa-comment mr-2"></i>
+                    <span>Add Comment</span>
+                  </a>
+                  <% } else { %>
+                    <a href="#" data-bs-toggle="modal" data-bs-target="#myModal"><i class="fas fa-comment"></i><span>Add
+                        Comment</span></a>
+                    <% } %>
+              </li>
+            </ul>
+            <ul class="postcard__tagbox"></ul>
+            <% if (book.genres && Array.isArray(book.genres)) { %>
+              <% book.genres.forEach(genreItem=> { %>
+                <li class="tag__item"><i class="fas fa-tag mr-2"></i>
+                  <span>
+                    <%= genreItem %>
+                  </span>
+                </li>
+                <% }); }%>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <div style="display: none;" id="addComment" class="container mb-5 mt-5">
+      <div class="card">
+        <span>Add Comment</span>
+        <form action="" method="post">
+          <div class="form-group">
+            <textarea class="form-control item" placeholder="Add your comment" name="comment" id="" cols="15" rows="5"
+              required></textarea>
+          </div>
+          <input type="hidden" id="bookId" value="<%= book._id %>">
+          <button class="btn btn-secondary" id="addCommitButton" type="submit">Post</button>
+        </form>
+        <script>
+          $(document).ready(function () {
+            $("#addCommitButton").click(function (e) {
+              e.preventDefault();
+
+              $.ajax({
+                url: "/book/" + $("#bookId").val() + "/addComment",
+                type: "POST",
+                data: {
+                  comment: $("textarea[name=comment]").val()
+                },
+                success: function (data) {
+                  // Başarılı işlem için burada kod ekleyin
+                  window.location.reload();
+                },
+                error: function (xhr) {
+                  if (xhr.status === 403) {
+                    alert("Access forbidden. Please login or check permissions.");
+                  } else {
+                    alert("An error occurred while adding the comment.");
+                  }
+                }
+              });
+            });
+          });
+        </script>
+      </div>
+    </div>
+
+    <div class="container mb-5 mt-5">
+      <div class="card">
+        <div class="row">
+          <div class="col-md-12">
+            <h3 class="text-center mb-5">
+              Comments
+            </h3>
+            <div class="row">
+              <div class="col-md-12">
+                <% if (book.comments && book.comments.length> 0) { %>
+                  <% mainComments=book.comments.filter(comment=> !comment.parentCommentId);
+                    let replies = book.comments.filter(comment => comment.parentCommentId);
+                    %>
+                    <% mainComments.forEach(function(mainComment) { %>
+                      <div class="media">
+                        <a href="#!"><img class="circleComment" alt="User Image"
+                            src="<%= mainComment.user.imageURL || 'https://i.imgur.com/stD0Q19.jpg' %>" /></a>
+                        <div class="media-body">
+                          <div class="row">
+                            <div class="col-8 d-flex">
+                              <h5>
+                                <%= mainComment.user.first_name %>
+                              </h5>
+                              <span>- <%= moment(mainComment.date).format('ddd MMM DD HH:mm') %></span>
+                            </div>
+                          </div>
+                          <div class="commentText">
+                            <div class="form-floating mb-3">
+                              <textarea class="form-control" placeholder="Leave a comment here"
+                                id="floatingTextarea2Disabled" style="height: 100px"
+                                disabled><%= mainComment.text %></textarea>
+                            </div>
+                          </div>
+                          <div class="pull-right reply">
+                            <% if (user) {%>
+                              <a href="#!" data-reply-id="<%= mainComment._id %>"><span><i
+                                    class="fa fa-reply"></i>reply</span></a>
+                              <% } else { %>
+                                <a href="#" data-bs-toggle="modal" data-bs-target="#myModal"><span><i
+                                      class="fa fa-reply"></i>reply</span></a>
+                                <% }%>
+                          </div>
+
+                          <% let replyCount=replies.filter(reply=> reply.parentCommentId.toString() ===
+                            mainComment._id.toString()).length;
+                            %>
+
+
+                            <% if (replyCount> 0) { %>
+                              <a href="#" class="toggle-replies"><span class="reply-toggle">Show replies</span> <span
+                                  class="reply-count">(<%= replyCount %>)</span></a>
+
+
+                              <div class="replies-section" style="display: none;">
+                                <% replies.forEach(function(reply) { %>
+                                  <% if (reply.parentCommentId.toString()===mainComment._id.toString()) { %>
+                                    <div class="media mt-4">
+                                      <a href="#!"><img class="circleComment" alt="User Image"
+                                          src="<%= reply.user.imageURL || 'https://i.imgur.com/stD0Q19.jpg' %>" /></a>
+                                      <div class="media-body">
+                                        <div class="row">
+                                          <div class="col-8 d-flex">
+                                            <h5>
+                                              <%= reply.user.first_name %>
+                                            </h5>
+                                            <span>- <%= moment(reply.date).format('ddd MMM DD HH:mm') %></span>
+                                          </div>
+                                        </div>
+                                        <div class="commentText">
+                                          <div class="form-floating mb-3">
+                                            <textarea class="form-control" placeholder="Leave a comment here"
+                                              id="floatingTextarea2Disabled" style="height: 100px"
+                                              disabled><%= reply.text %></textarea>
+                                          </div>
+                                        </div>
+                                        <div class="pull-right reply">
+                                          <a href="#!"><span><i class="fa fa-reply"></i> reply</span></a>
+                                        </div>
+                                      </div>
+                                    </div>
+                                    <% } %>
+                                      <% }) %>
+                              </div>
+                              <% } %>
+                        </div>
+                      </div>
+                      <script>
+                        $(document).ready(function () {
+                          $('.toggle-replies').click(function (e) {
+                            e.preventDefault();
+
+                            let $repliesSection = $(this).siblings('.replies-section');
+                            let $replyToggle = $(this).find('.reply-toggle');
+                            let $replyCount = $(this).find('.reply-count');
+
+                            if ($repliesSection.is(':visible')) {
+                              $repliesSection.hide();
+                              $replyToggle.text('Show replies');
+                              $replyCount.show();
+                            } else {
+                              $repliesSection.show();
+                              $replyToggle.text('Hide replies');
+                              $replyCount.hide();
+                            }
+                          });
+                        });
+                      </script>
+                      <% })} else { %>
+                        <h3 class="text-center">No comments yet</h3>
+                        <% } %>
+
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/simple-line-icons/2.4.1/css/simple-line-icons.min.css"
+      rel="stylesheet">
+    <div class="modal fade" id="myModal" tabindex="-1">
+      <div class="modal-dialog  modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header" style="display: block; align-items: center; text-align: center;">
+            <h3 class="modal-title">
+              Sign in
+            </h3>
+            <h6 class="modal-text">
+              You need to sign in first.
+            </h6>
+          </div>
+          <div class="modal-body">
+            <form action="/login" method="post">
+              <div class="form-icon">
+                <span><i class="icon icon-user"></i></span>
+              </div>
+              <div class="form-group">
+                <input type="text" class="form-control item" name="email" placeholder="E-mail" required />
+              </div>
+              <div class="form-group">
+                <input type="text" class="form-control item" name="password" placeholder="Password" required />
+              </div>
+              <button id="submitButton" type="submit" class="btn w-100" value="book"
+                style="line-height: 20px;border-radius: 14px;">
+                <div id="equal" style="display: none;">
+                  <script src="https://cdn.lordicon.com/bhenfmcm.js"></script>
+                  <lord-icon src="https://cdn.lordicon.com/dpinvufc.json" trigger="loop"
+                    colors="primary:#66d7ee,secondary:#08a88a" stroke="100" style="width:50px;height:50px">
+                  </lord-icon>
+                  <h6 style="line-height: 20px;">Yanıt bekleniyor...</h6>
+                </div>
+                <div id="normalbutton">
+                  <script src="https://cdn.lordicon.com/bhenfmcm.js"></script>
+                  <lord-icon src="https://cdn.lordicon.com/zmkotitn.json" trigger="hover" colors="primary:#66d7ee"
+                    state="hover-3" style="width:50px;height:50px">
+                  </lord-icon>
+                  <h6 style="line-height: 20px;">Login</h6>
+                </div>
+              </button>
+              <div class="uhaveaccount">Eğer hesabınız yok ise <a href="/register">Tıklayın</a></div>
+              <div id="error-message" class="error-message" style="display: none"></div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+
+      const addComment = document.getElementById('addComment');
+      const showAddComment = document.getElementById('showAddComment');
+      var user =
+        document.getElementById("userislogin").getAttribute("data-user-usersignin");
+      let show = 0;
+      if (user) {
+        showAddComment.addEventListener('click', () => {
+          if (show == 0) {
+            addComment.style.display = 'block';
+            show = 1;
+          }
+          else if (show == 1) {
+            addComment.style.display = 'none';
+            show = 0;
+          }
+        });
+      }
+
+    </script>
+
+
+
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <link rel="stylesheet" href="/PopUpCard.css">
+</body>
+
+</html>

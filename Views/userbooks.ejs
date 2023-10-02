@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Document</title>
+
+</head>
+<body>
+   <%- include("partials/menubar.ejs") %>
+   <div class="row row-cols-1 row-cols-md-3 g-4">
+      <% books.forEach(book => { %>
+        
+      <div class="col">
+        <div class="card h-100">
+<a class="postcard__img_link" href="/book/<%= book._id %>"><img src="<%= book.book_image %>" class="card-img-top" alt="Skyscrapers"/></a>
+          <div class="card-body">
+            <h5 class="card-title"><%= book.title %></h5>
+            <h5 class="card-title"><%= book.author %></h5>
+            <p class="card-text">
+               <%= book.description %>
+            </p>
+          </div>
+          <div class="card-footer">
+            <small class="text-muted"><%= book.last_update %></small>
+            <small class="text-muted"><%= book.added_by %></small>
+          </div>
+        </div>
+      </div>
+    
+      <% }); %>
+    </div>
+</body>
+</html>

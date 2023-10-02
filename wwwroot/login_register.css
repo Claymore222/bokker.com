@@ -1,0 +1,81 @@
+body{
+  background-color: #94d3f8;
+}
+
+.registration-form{
+padding: 50px 0;
+}
+
+.registration-form form{
+  background-color: #fff;
+  max-width: 600px;
+  margin: auto;
+  padding: 50px 70px;
+  border-radius: 30px;
+  box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.075);
+}
+
+.registration-form .form-icon{
+  text-align: center;
+  background-color: #555555;
+  border-radius: 50%;
+  font-size: 40px;
+  color: white;
+  width: 100px;
+  height: 100px;
+  margin: auto;
+  margin-bottom: 50px;
+  line-height: 100px;
+}
+
+.registration-form .item{
+  border-radius: 20px;
+  margin-bottom: 25px;
+  padding: 10px 20px;
+}
+
+.registration-form .create-account{
+  border-radius: 30px;
+  padding: 10px 20px;
+  font-size: 18px;
+  font-weight: bold;
+  background-color: #555555;
+  border: none;
+  color: white;
+  margin-top: 20px;
+}
+
+@media (max-width: 576px) {
+  .registration-form form{
+      padding: 50px 20px;
+  }
+
+  .registration-form .form-icon{
+      width: 70px;
+      height: 70px;
+      font-size: 30px;
+      line-height: 70px;
+  }
+}
+.uhaveaccount{
+  width: 100%;
+  margin-top: 5px;
+  border-radius: 8px;
+  text-align: center;
+}
+.error-message{
+  width: 100%;
+  margin-top: 5px;
+  border-radius: 8px;
+  border: 1px solid rgb(130, 0, 0);
+  text-align: center;
+  color: rgb(130, 0, 0);
+}
+.error-message-primary{
+  width: 100%;
+  margin-top: 5px;
+  border-radius: 8px;
+  border: 1px solid #555555;
+  text-align: center;
+  color: 555555;
+}

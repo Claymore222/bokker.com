@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Register</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/simple-line-icons/2.4.1/css/simple-line-icons.min.css"
+    rel="stylesheet">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+
+</head>
+
+<body>
+  <%- include("partials/menubar.ejs") %>
+    <link rel="stylesheet" href="/login_register.css" />
+    <div class="registration-form">
+      <form action="" method="post" enctype="multipart/form-data">
+        <div class="form-icon">
+          <span><i class="icon icon-user"></i></span>
+        </div>
+        <div class="form-group">
+          <input type="text" class="form-control item" name="first_name" id="first_name" placeholder="Name" required>
+        </div>
+        <div class="form-group">
+          <input type="text" class="form-control item" name="last_name" id="last_name" placeholder="Surname" required>
+        </div>
+        <div class="form-group">
+          <input type="email" class="form-control item" name="email" id="email" placeholder="Email" required
+            pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$">
+        </div>
+        <div class="form-group">
+          <input type="password" minlength="6" class="form-control item" name="password" id="phone-number"
+            placeholder="Password" required>
+        </div>
+        <div class="form-group">
+          <input type="file" class="form-control item" name="profileImage" id="profileImage" placeholder="Profile Image"
+            required>
+        </div>
+        <div class="form-group">
+          <button id="submitButton" type="submit" class="form-control item" value="" style="line-height: 20px;">
+            <div id="equal" style="display: none;">
+              <script src="https://cdn.lordicon.com/bhenfmcm.js"></script>
+              <lord-icon src="https://cdn.lordicon.com/dpinvufc.json" trigger="loop"
+                colors="primary:#66d7ee,secondary:#08a88a" stroke="100" style="width:50px;height:50px">
+              </lord-icon>
+              <h6 style="line-height: 20px;">Yanıt bekleniyor...</h6>
+            </div>
+            <div id="normalbutton">
+              <script src="https://cdn.lordicon.com/bhenfmcm.js"></script>
+              <lord-icon src="https://cdn.lordicon.com/alzqexpi.json" trigger="hover"
+                colors="primary:#121331,secondary:#646e78,tertiary:#ffc738,quaternary:#f9c9c0,quinary:#ebe6ef"
+                stroke="100" state="hover-2" style="width:50px;height:50px">
+              </lord-icon>
+              <h6 style="line-height: 20px;">Login</h6>
+            </div>
+          </button>
+        </div>
+        <div class="uhaveaccount">Eğer hesabınız var ise <a href="/login">Tıklayın</a></div>
+        <div id="error-message" class="error-message" style="display: none"></div>
+      </form>
+    </div>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script type="text/javascript"
+      src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.15/jquery.mask.min.js"></script>
+    <script>
+      const inputs = document.querySelectorAll(".form-control input");
+      const labels = document.querySelectorAll(".form-control label");
+
+      labels.forEach((label) => {
+        label.innerHTML = label.innerText
+          .split("")
+          .map(
+            (letter, idx) => `<span style="
+      transition-delay: ${idx * 50}ms
+    ">${letter}</span>`
+          )
+          .join("");
+      });
+
+      const floating_btn = document.querySelector(".floating-btn");
+      const close_btn = document.querySelector(".close-btn");
+      const social_panel_container = document.querySelector(
+        ".social-panel-container"
+      );
+    </script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const urlParams = new URLSearchParams(window.location.search);
+        const error = urlParams.get("error");
+
+        if (error) {
+          const errorMessageElement = document.getElementById("error-message");
+          errorMessageElement.textContent = error;
+          errorMessageElement.style.display = "block";
+
+          // Hata mesajını gösterdikten sonra URL'deki error parametresini kaldır.
+          history.replaceState({}, document.title, "/register");
+        }
+      });
+    </script>
+</body>
+
+</html>

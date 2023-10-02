@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<style>
+.favorites-container {
+    background: #fff;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.svg-container img{
+    max-width: 300px;
+    margin: 0 auto;
+}
+
+.favorites-container h1 {
+    color: #333;
+    font-size: 24px;
+    margin-top: 20px;
+}
+
+.favorites-container p {
+    color: #666;
+}
+
+.explore-btn {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: #3498db;
+    color: #fff;
+    border-radius: 5px;
+    text-decoration: none;
+    transition: background-color 0.3s;
+}
+
+.explore-btn:hover {
+    background-color: #2980b9;
+}
+</style>
+
+<body>
+
+  <%- include("partials/menubar.ejs") %>
+    <% if (books && books.length> 0) { %>
+      <% books.forEach(book=> { %>
+        <link rel="stylesheet" href="/library.css">
+        <section class="dark display-none">
+          <div class="container py-4">
+            <article class="postcard red">
+              <a class="postcard__img_link" href="/book/<%= book._id %>">
+                <img class="postcard__img" src="<%= book.book_image %>" alt="Image Title" />
+              </a>
+              <div class="postcard__text">
+                <h1 class="postcard__title red"><a href="/book/<%= book._id %>">
+                    <%= book.title %>
+                  </a></h1>
+                <div class="postcard__subtitle small">
+                  <time datetime="2020-05-25 12:00:00">
+                    <i class="fas fa-calendar-alt mr-2"></i>
+                    <%= book.publication_date %>
+                  </time>
+                </div>
+                <div class="postcard__bar"></div>
+                <div class="postcard__preview-txt">
+                  <%= book.description %>
+                </div>
+                <ul class="postcard__tagbox">
+                  <li class="tag__item"><i class="fas fa-star mr-2"></i><span>
+                      <label for="">Point: </label>
+                      <%= book.points %>
+                    </span></li>
+                  <li class="tag__item"><i class="fas fa-file mr-2"></i><span>
+                      <label for="">Page Count: </label>
+                      <%= book.page_count %>
+                    </span></li>
+                  <li class="tag__item">
+                    <a href="#"><i class="fas fa-comment mr-2"></i><span>Add Comment</span></a>
+                  </li>
+                  <li class="tag__item">
+                    <% if(user.favoriteBooks.includes(book._id)) { %>
+                      <a href="javascript:void(0)" onclick="toggleFavorite('<%= book._id %>' , 'remove')"><i
+                          class="fas fa-bookmark"></i><span>Remove Favorite</span></a>
+                      <% } else { %>
+                        <a href="javascript:void(0)" onclick="toggleFavorite('<%= book._id %>', 'add')"><i
+                            class="fas fa-bookmark"></i><span>Add Favorite</span></a>
+                        <% } %>
+                  </li>
+                </ul>
+                <ul class="postcard__tagbox">
+                  <% if (book.genres && Array.isArray(book.genres)) { %>
+                    <% book.genres.forEach(genreItem=> { %>
+                      <li class="tag__item"><i class="fas fa-tag mr-2"></i>
+                        <span>
+                          <%= genreItem %>
+                        </span>
+                      </li>
+                      <% }); }%>
+                </ul>
+              </div>
+            </article>
+          </div>
+        </section>
+        <% }); %>
+          <% } else { %>
+            <div class="favorites-container">
+              <div class="svg-container">
+                <img src="https://firebasestorage.googleapis.com/v0/b/nodejsauthentication-7d9a1.appspot.com/o/bubble-gum-error-404.gif?alt=media&token=552c9772-e0f2-490f-bd98-ab654e1684c7" alt="">
+              </div>
+              <h1>Henüz Favori Kitabınız Yok!</h1>
+              <p>Keşfetmek ve favorilere eklemek için kitaplık bölümüne göz atın.</p>
+              <a href="/library" class="explore-btn">Kitaplığa Git</a>
+            </div>
+            <% } %>
+
+              <script>
+                async function addToFavorites(bookId) {
+                  try {
+                    const response = await fetch('/addfavorite', {
+                      method: 'POST',
+                      headers: {
+                        'Content-Type': 'application/json'
+                      },
+                      body: JSON.stringify({ bookId: bookId })
+                    });
+                    const data = await response.json();
+                    if (data.success) {
+                    } else {
+                      alert(data.message || 'Bir hata oluştu!');
+                      console.log(error)
+                    }
+                  } catch (error) {
+                    console.log(error)
+                  }
+                }
+
+                async function removeFromFavorites(bookId) {
+                  try {
+                    const response = await fetch('/removefavorite', {
+                      method: 'POST',
+                      headers: {
+                        'Content-Type': 'application/json'
+                      },
+                      body: JSON.stringify({ bookId: bookId })
+                    });
+                    const data = await response.json();
+                    if (data.success) {
+                    } else {
+                      alert(data.message || 'Bir hata oluştu!');
+                    }
+                  } catch (error) {
+                    alert('Bir hata oluştu!');
+                  }
+                }
+
+                async function toggleFavorite(bookId, action) {
+                  let url = action === 'add' ? '/addfavorite' : '/removefavorite';
+
+                  try {
+                    const response = await fetch(url, {
+                      method: 'POST',
+                      headers: {
+                        'Content-Type': 'application/json'
+                      },
+                      body: JSON.stringify({ bookId: bookId })
+                    });
+                    const data = await response.json();
+
+                    if (data.success) {
+                      if (action === 'add') {
+                        console.log("added")
+                      } else {
+                        console.log("Removed")
+                      }
+                      location.reload();
+                    } else {
+                      alert(data.message || 'Bir hata oluştu!');
+                    }
+                  } catch (error) {
+                    alert('Bir hata oluştu!');
+                  }
+                }
+              </script>
+
+</body>
+
+</html>
